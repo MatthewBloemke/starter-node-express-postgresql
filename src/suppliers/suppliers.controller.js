@@ -1,19 +1,21 @@
 const SuppliersService = require("./suppliers.service.js");
 
+const validFields = new Set([
+  "supplier_name",
+  "supplier_address_line_1",
+  "supplier_address_line_2",
+  "supplier_city",
+  "supplier_state",
+  "supplier_zip",
+  "supplier_phone",
+  "supplier_email",
+  "supplier_notes",
+  "supplier_type_of_goods",
+]);
+
+
 function hasValidFields(req, res, next) {
   const { data = {} } = req.body;
-  const validFields = new Set([
-    "supplier_name",
-    "supplier_address_line_1",
-    "supplier_address_line_2",
-    "supplier_city",
-    "supplier_state",
-    "supplier_zip",
-    "supplier_phone",
-    "supplier_email",
-    "supplier_notes",
-    "supplier_type_of_goods",
-  ]);
 
   const invalidFields = Object.keys(data).filter(
     field => !validFields.has(field)
@@ -40,25 +42,6 @@ function bodyDataHas(propertyName) {
 const hasSupplierName = bodyDataHas("supplier_name");
 const hasSupplierEmail = bodyDataHas("supplier_email");
 
-function create(req, res, next) {
-  const newSupplier = ({
-    supplier_name,
-    supplier_address_line_1,
-    supplier_address_line_2,
-    supplier_city,
-    supplier_state,
-    supplier_zip,
-    supplier_phone,
-    supplier_email,
-    supplier_notes,
-    supplier_type_of_goods,
-  } = req.body.data);
-
-  SuppliersService.createSupplier(newSupplier).then(createdSupplier =>
-    res.status(201).json({ data: createdSupplier })
-  );
-}
-
 function supplierExists(req, res, next) {
   const error = { status: 404, message: `Supplier cannot be found.` };
   const { supplierId } = req.params;
@@ -71,23 +54,28 @@ function supplierExists(req, res, next) {
   });
 }
 
-function update(req, res, next) {
+async function create(req, res, next) {
+  let newSupplier = await SuppliersService.createSupplier(req.body.data);
+  res.status(201).json({ data: newSupplier });
+}
+
+async function update(req, res, next) {
   const {
     supplier: { supplier_id: supplierId, ...supplier },
   } = res.locals;
   const updatedSupplier = { ...supplier, ...req.body.data };
 
-  SuppliersService.updateSupplierById(
+  const data = await SuppliersService.updateSupplierById(
     supplierId,
     updatedSupplier
-  ).then(updatedSupplier => res.json({ data: updatedSupplier }));
+  );
+  res.json({ data });
 }
 
-function destroy(req, res, next) {
+async function destroy(req, res, next) {
   const { supplier } = res.locals;
-  SuppliersService.deleteSupplierById(supplier.supplier_id).then(() =>
-    res.sendStatus(204)
-  );
+  await SuppliersService.deleteSupplierById(supplier.supplier_id);
+  res.sendStatus(204);
 }
 
 module.exports = {
