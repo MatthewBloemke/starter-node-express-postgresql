@@ -43,24 +43,6 @@ function bodyDataHas(propertyName) {
 const hasSupplierName = bodyDataHas("supplier_name");
 const hasSupplierEmail = bodyDataHas("supplier_email");
 
-async function create(req, res, next) {
-  const newSupplier = ({
-    supplier_name,
-    supplier_address_line_1,
-    supplier_address_line_2,
-    supplier_city,
-    supplier_state,
-    supplier_zip,
-    supplier_phone,
-    supplier_email,
-    supplier_notes,
-    supplier_type_of_goods,
-  } = req.body.data);
-
-  const createdSupplier = await SuppliersService.createSupplier(newSupplier);
-  res.status(201).json({ data: createdSupplier });
-}
-
 async function supplierExists(req, res, next) {
   const error = { status: 404, message: `Supplier cannot be found.` };
   const { supplierId } = req.params;
@@ -70,6 +52,11 @@ async function supplierExists(req, res, next) {
   if (!supplier) return next(error);
   res.locals.supplier = supplier;
   next();
+}
+
+async function create(req, res, next) {
+  let newSupplier = await SuppliersService.createSupplier(req.body.data);
+  res.status(201).json({ data: newSupplier });
 }
 
 async function update(req, res, next) {
