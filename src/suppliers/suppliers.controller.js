@@ -47,7 +47,6 @@ async function supplierExists(req, res, next) {
   const error = { status: 404, message: `Supplier cannot be found.` };
   const { supplierId } = req.params;
   if (!supplierId) return next(error);
-
   const supplier = await SuppliersService.getSupplierById(supplierId);
   if (!supplier) return next(error);
   res.locals.supplier = supplier;
