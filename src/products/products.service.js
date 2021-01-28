@@ -7,23 +7,22 @@ const getAllProducts = () => products.select("*");
 const getProductById = (productId) =>
   products.select("*").where({ product_id: productId }).first();
 
-const getOutOfStockProductsCount = () =>
+const getOutOfStockCount = () =>
   products
     .select("product_quantity_in_stock as out_of_stock")
     .count("product_id")
     .where({ product_quantity_in_stock: 0 })
     .groupBy("out_of_stock");
 
-const getMinMaxAveragePricesOfProductsBySupplier = () =>
+const getPriceSummary = () =>
   products
     .select("supplier_id")
     .min("product_price")
     .max("product_price")
     .avg("product_price")
-    .groupBy("supplier_id")
-    .orderBy("supplier_id");
+    .groupBy("supplier_id");
 
-const getTotalWeightOfEachProduct = () =>
+const getTotalWeightByProduct = () =>
   products
     .select(
       "product_sku",
@@ -32,13 +31,12 @@ const getTotalWeightOfEachProduct = () =>
         "sum(product_weight_in_lbs * product_quantity_in_stock) as total_weight_in_lbs"
       )
     )
-    .groupBy("product_title", "product_sku")
-    .orderBy("total_weight_in_lbs");
+    .groupBy("product_title", "product_sku");
 
 module.exports = {
   getAllProducts,
   getProductById,
-  getOutOfStockProductsCount,
-  getMinMaxAveragePricesOfProductsBySupplier,
-  getTotalWeightOfEachProduct,
+  getOutOfStockCount,
+  getPriceSummary,
+  getTotalWeightByProduct,
 };
