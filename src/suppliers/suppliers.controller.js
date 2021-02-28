@@ -1,4 +1,5 @@
 const SuppliersService = require("./suppliers.service.js");
+const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 
 const validFields = new Set([
   "supplier_name",
@@ -18,7 +19,7 @@ function hasValidFields(req, res, next) {
   const { data = {} } = req.body;
 
   const invalidFields = Object.keys(data).filter(
-    field => !validFields.has(field)
+    (field) => !validFields.has(field)
   );
 
   if (invalidFields.length)
@@ -56,7 +57,7 @@ async function create(req, res, next) {
     supplier_type_of_goods,
   } = req.body.data);
 
-  let createdSupplier = await SuppliersService.createSupplier(newSupplier);
+  const createdSupplier = await SuppliersService.createSupplier(newSupplier);
   res.status(201).json({ data: createdSupplier });
 }
 
@@ -91,7 +92,12 @@ async function destroy(req, res, next) {
 }
 
 module.exports = {
-  create: [hasValidFields, hasSupplierName, hasSupplierEmail, create],
-  update: [supplierExists, update],
-  destroy: [supplierExists, destroy],
+  create: [
+    hasValidFields,
+    hasSupplierName,
+    hasSupplierEmail,
+    asyncErrorBoundary(create),
+  ],
+  update: [asyncErrorBoundary(supplierExists), asyncErrorBoundary(update)],
+  destroy: [asyncErrorBoundary(supplierExists), asyncErrorBoundary(destroy)],
 };
