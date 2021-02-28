@@ -54,7 +54,7 @@ async function supplierExists(req, res, next) {
 }
 
 async function create(req, res, next) {
-  let newSupplier = await SuppliersService.createSupplier(req.body.data);
+  const newSupplier = await SuppliersService.createSupplier(req.body.data);
   res.status(201).json({ data: newSupplier });
 }
 

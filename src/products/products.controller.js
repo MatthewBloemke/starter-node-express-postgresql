@@ -20,7 +20,7 @@ function read(req, res, next) {
 }
 
 async function list(req, res, next) {
-  let products = await ProductsService.getAllProducts();
+  const products = await ProductsService.getAllProducts();
   res.json({ data: products });
 }
 
