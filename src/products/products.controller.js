@@ -7,7 +7,7 @@ async function productExists(req, res, next) {
   const { productId } = req.params;
   if (!productId) return next(error);
 
-  let product = await ProductsService.getProductById(productId);
+  const product = await ProductsService.getProductById(productId);
 
   if (!product) return next(error);
   res.locals.product = product;

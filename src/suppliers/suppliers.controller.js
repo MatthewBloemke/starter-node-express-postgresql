@@ -66,7 +66,7 @@ async function supplierExists(req, res, next) {
   const { supplierId } = req.params;
   if (!supplierId) return next(error);
 
-  let supplier = await SuppliersService.getSupplierById(supplierId);
+  const supplier = await SuppliersService.getSupplierById(supplierId);
   if (!supplier) return next(error);
   res.locals.supplier = supplier;
   next();
